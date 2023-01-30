@@ -1,19 +1,33 @@
 let users = [];
-var mainIndex = 0;
 // Get Data From API
+const fetchAPI = (method, endPoint, data) => {
+  fetch(`http://localhost:5000/${endPoint}`, {
+    method: method,
+    body: JSON.stringify(data),
+    headers: {
+      "Content-type": "application/json; charset=UTF-8",
+    },
+  })
+    .then((response) => response.json())
+    .then((data) => {
+      if (data.message == "Success") {
+        getData();
+      }
+    });
+};
 const getData = () => {
   fetch("http://localhost:5000/users")
     .then((respopnse) => respopnse.json())
     .then((ResponseData) => {
       if (ResponseData.message == "Success") {
         users = ResponseData.result;
-        getAll(users);
+        getAllUsers(users);
       }
       console.log(users);
     });
 };
 // For LOOP For Users
-const getAll = (list) => {
+const getAllUsers = (list) => {
   var container = ``;
   for (let i = 0; i < list.length; i++) {
     container += `<tr>
@@ -56,20 +70,7 @@ const addUser = () => {
     age: userAge,
   };
   console.log(inputOBJ);
-  fetch("http://localhost:5000/addUser", {
-    method: "POST",
-    body: JSON.stringify(inputOBJ),
-    headers: {
-      "Content-type": "application/json; charset=UTF-8",
-    },
-  })
-    .then((response) => response.json())
-    .then((data) => {
-      if (data.message == "Success") {
-        getData();
-      }
-    });
-  console.log("Success");
+  fetchAPI("POST", "addUser", inputOBJ);
   clearForm();
   $("#addUserModal").modal("hide");
 };
@@ -85,19 +86,7 @@ const deleteUser = (j) => {
     id: j,
   };
   console.log(inputOBJ);
-  fetch("http://localhost:5000/deleteUser", {
-    method: "POST",
-    body: JSON.stringify(inputOBJ),
-    headers: {
-      "Content-type": "application/json; charset=UTF-8",
-    },
-  })
-    .then((response) => response.json())
-    .then((data) => {
-      if (data.message == "Success") {
-        getData();
-      }
-    });
+  fetchAPI("POST", "deleteUser", inputOBJ);
   console.log("Success");
 };
 const update = (index) => {
@@ -118,23 +107,10 @@ const updateUser = () => {
     age: useruAge,
   };
   console.log(inputOBJ);
-  fetch("http://localhost:5000/updateUser", {
-    method: "POST",
-    body: JSON.stringify(inputOBJ),
-    headers: {
-      "Content-type": "application/json; charset=UTF-8",
-    },
-  })
-    .then((response) => response.json())
-    .then((data) => {
-      if (data.message == "Success") {
-        getData();
-      }
-    });
+  fetchAPI("POST", "UpdateUser", inputOBJ);
   clearForm();
   $("#editUserModal").modal("hide");
 };
-
 const search = (searchKey) => {
   const searchlist = [];
   for (let i = 0; i < users.length; i++) {
@@ -142,17 +118,5 @@ const search = (searchKey) => {
       searchlist.push(users[i]);
     }
   }
-  getAll(searchlist);
+  getAllUsers(searchlist);
 };
-// function validateSiteName() {
-//     const regex = /^[A-Za-z]{1,}$/
-//     if (regex.test(siteName.value)) {
-//         document.getElementById("errorName").classList.add("d-none")
-
-//         return true
-//     } else {
-//         document.getElementById("errorName").classList.remove("d-none")
-
-//         return false
-//     }
-// }
